@@ -6,9 +6,10 @@
 
 <div class="text-center">
     <h1 class="display-4">Weather Forecast</h1>
+    <span>(Web App host: <strong>@Model.Host</strong>)</span>
 </div>
 <br>
-Data from: <a href="@Model.GetApiUrl" target="_blank">@Model.GetApiUrl</a>
+Data from: <a href="@Model.GetApiUrl" target="_blank">@Model.GetApiUrl</a> (Web Api host: <strong>@Model.ForecastPage?.Host</strong>)
 <table class="table table-hover">
     <thead class="thead-dark">
         <tr>
@@ -19,7 +20,7 @@ Data from: <a href="@Model.GetApiUrl" target="_blank">@Model.GetApiUrl</a>
         </tr>
     </thead>
     <tbody>
-        @if (Model.Items == null)
+        @if (Model.ForecastPage == null)
         {
             <tr>
                 <td colspan="4" class="table-warning">Error getting information from "@Model.GetApiUrl" (@Model.ErrorMessage)</td>
@@ -27,7 +28,7 @@ Data from: <a href="@Model.GetApiUrl" target="_blank">@Model.GetApiUrl</a>
         }
         else
         {
-            @foreach (var item in Model.Items)
+            @foreach (var item in Model.ForecastPage.Items)
             {
                 <tr>
                     <th scope="row">@($"{item.Date:yyyy-MM-dd HH:mm:ss}")</th>
