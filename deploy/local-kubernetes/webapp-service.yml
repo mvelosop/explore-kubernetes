@@ -7,8 +7,6 @@ metadata:
     service: webapp
 spec:
   ports:
-  - nodePort: 30080
-    port: 80
-  type: NodePort
+  - port: 80
   selector:
     service: webapp
