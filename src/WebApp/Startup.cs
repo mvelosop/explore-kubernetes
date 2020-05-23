@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,18 @@ namespace WebApp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var pathBase = Configuration["PATH_BASE"];
+            if (!string.IsNullOrWhiteSpace(pathBase))
+            {
+                app.UsePathBase(pathBase);
+
+                app.Use((context, next) =>
+                {
+                    context.Request.PathBase = new PathString($"{pathBase}");
+                    return next();
+                });
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
