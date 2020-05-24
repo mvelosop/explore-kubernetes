@@ -10,7 +10,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /web
         backend:
           serviceName: webapp-service
           servicePort: 80
