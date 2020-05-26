@@ -13,7 +13,6 @@ namespace WebApp.Pages.WeatherForecast
 {
     public class IndexModel : PageModel
     {
-        private const string ApiGetUrl = "WeatherForecast";
         private readonly ILogger<IndexModel> _logger;
         private readonly WeatherForecastApiClient _client;
         private readonly IConfiguration _configuration;
@@ -31,7 +30,7 @@ namespace WebApp.Pages.WeatherForecast
 
         }
 
-        public string GetApiUrl => _client.GetApiUri(ApiGetUrl);
+        public string GetApiUrl => _client.GetApiUri;
 
         public WeatherForecastPage ForecastPage { get; set; }
 
@@ -39,11 +38,20 @@ namespace WebApp.Pages.WeatherForecast
 
         public string ErrorMessage { get; private set; }
 
+        [BindProperty(SupportsGet = true)]
+        public int? statusCode { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int? delay { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public bool? exception { get; set; }
+
         public async Task OnGet()
         {
             try
             {
-                var response = await _client.GetAsync(ApiGetUrl);
+                var response = await _client.GetForecastAsync(CreateQueryString(statusCode, delay, exception));
                 var content = await response.Content.ReadAsStringAsync();
                 ForecastPage = JsonConvert.DeserializeObject<WeatherForecastPage>(content);
             }
@@ -53,5 +61,14 @@ namespace WebApp.Pages.WeatherForecast
             }
         }
 
+        private string CreateQueryString(int? statusCode, int? delay, bool? exception)
+        {
+            var query = 
+                (statusCode.HasValue ? $"&statusCode={statusCode}" : null) +
+                (delay.HasValue ? $"&delay={delay}" : null) +
+                (exception.HasValue ? $"&exception={exception}" : null);
+
+            return query == "" ? null : query.Substring(1);
+        }
     }
 }

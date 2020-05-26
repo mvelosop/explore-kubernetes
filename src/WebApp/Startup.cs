@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 using WebApp.Pages.WeatherForecast;
 
 namespace WebApp
@@ -28,12 +29,20 @@ namespace WebApp
         {
             services.AddRazorPages();
 
-            services.AddTransient<HttpClient>();
-            services.AddTransient<WeatherForecastApiClient>();
+            // services.AddTransient<HttpClient>();
+            // services.AddTransient<WeatherForecastApiClient>();
+
             services.AddHttpClient<WeatherForecastApiClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["WebApiBaseAddress"]);
-            });
+            })
+            .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
+            {
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(15),
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

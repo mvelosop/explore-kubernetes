@@ -20,6 +20,7 @@ services:
       dockerfile: src/WebApp/Dockerfile
     ports:
       - 50080:80
+      - 50443:443
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
