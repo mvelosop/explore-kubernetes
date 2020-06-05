@@ -14,14 +14,11 @@ namespace WebApp.Pages.WeatherForecast
             this.client = client;
         }
 
-        public string GetApiUri => $"{client.BaseAddress}{ApiGetUrl}";
+        public string ApiGetUri => $"{client.BaseAddress}{ApiGetUrl}";
 
-        public async Task<HttpResponseMessage> GetForecastAsync(string query = null)
+        public async Task<HttpResponseMessage> GetForecastAsync()
         {
-            var builder = new UriBuilder(GetApiUri);
-            builder.Query = query;
-
-            return await client.GetAsync(builder.ToString());
+            return await client.GetAsync(ApiGetUri);
         }
     }
 }

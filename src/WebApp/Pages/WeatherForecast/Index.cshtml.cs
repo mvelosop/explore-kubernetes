@@ -30,7 +30,7 @@ namespace WebApp.Pages.WeatherForecast
 
         }
 
-        public string GetApiUrl => _client.GetApiUri;
+        public string GetApiUrl => _client.ApiGetUri;
 
         public WeatherForecastPage ForecastPage { get; set; }
 
@@ -51,7 +51,7 @@ namespace WebApp.Pages.WeatherForecast
         {
             try
             {
-                var response = await _client.GetForecastAsync(CreateQueryString(statusCode, delay, exception));
+                var response = await _client.GetForecastAsync();
                 var content = await response.Content.ReadAsStringAsync();
                 ForecastPage = JsonConvert.DeserializeObject<WeatherForecastPage>(content);
             }
@@ -59,16 +59,6 @@ namespace WebApp.Pages.WeatherForecast
             {
                 ErrorMessage = ex.Message;
             }
-        }
-
-        private string CreateQueryString(int? statusCode, int? delay, bool? exception)
-        {
-            var query = 
-                (statusCode.HasValue ? $"&statusCode={statusCode}" : null) +
-                (delay.HasValue ? $"&delay={delay}" : null) +
-                (exception.HasValue ? $"&exception={exception}" : null);
-
-            return query == "" ? null : query.Substring(1);
         }
     }
 }
