@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: webapi-service
   labels:
-    app: web-application
+    app: weatherapp
     service: webapi
 spec:
   ports:

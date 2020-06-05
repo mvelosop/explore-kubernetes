@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: webapp-ingress
   labels:
-    app: web-application
+    app: weatherapp
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:

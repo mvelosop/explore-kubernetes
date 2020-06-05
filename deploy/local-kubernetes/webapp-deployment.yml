@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: webapp-deployment
   labels:
-    app: web-application
+    app: weatherapp
 spec:
   replicas: 1
   selector:
@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
         service: webapp
-        app: web-application
+        app: weatherapp
     spec:
       containers:
       - name: webapp

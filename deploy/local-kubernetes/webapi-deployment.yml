@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: webapi-deployment
   labels:
-    app: web-application
+    app: weatherapp
 spec:
   replicas: 3
   selector:
@@ -13,7 +13,7 @@ spec:
     metadata:
       labels:
         service: webapi
-        app: web-application
+        app: weatherapp
     spec:
       containers:
       - name: webapi
