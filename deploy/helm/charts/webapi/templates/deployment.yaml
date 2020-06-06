@@ -42,11 +42,11 @@ spec:
                 name: {{ include "webapi.fullname" . }}
           livenessProbe:
             httpGet:
-              path: /WeatherForecast
+              path: /hc/liveness
               port: http
           readinessProbe:
             httpGet:
-              path: /WeatherForecast
+              path: /hc/readiness
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

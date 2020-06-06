@@ -42,11 +42,11 @@ spec:
                 name: {{ include "webapp.fullname" . }}
           livenessProbe:
             httpGet:
-              path: /
+              path: /hc/liveness
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /hc/readiness
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

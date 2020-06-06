@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -45,8 +46,16 @@ namespace WebApi
 
             app.UseHttpsRedirection();
 
+            app.MapWhen(context => 
+                context.Request.Path.Value.StartsWith("/hc/"),
+                ab => ab.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("OK.");
+                })
+            );
+
             app.UseSerilogRequestLogging();
-            
+
             app.UseRouting();
 
             app.UseAuthorization();

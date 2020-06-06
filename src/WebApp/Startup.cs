@@ -36,14 +36,7 @@ namespace WebApp
             services.AddHttpClient<WeatherForecastApiClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["WebApiBaseAddress"]);
-            })
-            .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(10),
-                TimeSpan.FromSeconds(15),
-            }));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +67,14 @@ namespace WebApp
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.MapWhen(context =>
+                context.Request.Path.Value.StartsWith("/hc/"),
+                ab => ab.Use(async (context, next) =>
+                {
+                    await context.Response.WriteAsync("OK.");
+                })
+            );
 
             app.UseSerilogRequestLogging();
 
