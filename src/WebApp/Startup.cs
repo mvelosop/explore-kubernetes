@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Serilog;
 using WebApp.Pages.WeatherForecast;
@@ -28,20 +29,23 @@ namespace WebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            Log.Information("----- Begin configuring services.");
 
-            // services.AddTransient<HttpClient>();
-            // services.AddTransient<WeatherForecastApiClient>();
+            services.AddRazorPages();
 
             services.AddHttpClient<WeatherForecastApiClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["WebApiBaseAddress"]);
             });
+
+            Log.Information("----- End configuring services.");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Log.Information("----- Begin configuring pipeline.");
+
             var pathBase = Configuration["PATH_BASE"];
             if (!string.IsNullOrWhiteSpace(pathBase))
             {
@@ -86,6 +90,8 @@ namespace WebApp
             {
                 endpoints.MapRazorPages();
             });
+
+            Log.Information("----- End configuring pipeline.");
         }
     }
 }
