@@ -62,16 +62,13 @@ namespace WebApp
                 {
                     Log.Information("----- Configuring logging...");
 
-                    var telemetryConfiguration = services.GetRequiredService<TelemetryConfiguration>();
-
                     loggerConfiguration
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.WithProperty("HostName", HostName)
                         .Enrich.WithProperty("ApplicationContext", AppName)
-                        .WriteTo.Console()
-                        .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
-                        .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces);
-                })
+                        .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341");
+                },
+                writeToProviders: true)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     Log.Information("----- Configuring WebHost defaults...");
