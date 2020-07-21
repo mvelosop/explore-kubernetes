@@ -54,9 +54,13 @@ namespace WebApp.Pages.WeatherForecast
                 var response = await _client.GetForecastAsync();
                 var content = await response.Content.ReadAsStringAsync();
                 ForecastPage = JsonConvert.DeserializeObject<WeatherForecastPage>(content);
+
+                _logger.LogInformation("----- Response: {@ForecastPage}", ForecastPage);
             }
             catch (Exception ex)
             {
+                _logger.LogWarning(ex, "----- ERROR: {Message}", ex.Message);
+
                 ErrorMessage = ex.Message;
             }
         }

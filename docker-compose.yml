@@ -6,7 +6,7 @@ services:
     image: webapi
     build:
       context: .
-      dockerfile: src/WebApi/Dockerfile
+      dockerfile: src/WebApi/Dockerfile.local
     ports:
       - 51080:80
     environment:
@@ -17,7 +17,7 @@ services:
     image: webapp
     build:
       context: .
-      dockerfile: src/WebApp/Dockerfile
+      dockerfile: src/WebApp/Dockerfile.local
     ports:
       - 50080:80
       - 50443:443
