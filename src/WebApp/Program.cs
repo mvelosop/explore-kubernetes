@@ -1,17 +1,9 @@
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.IO;
-using Serilog.Extensions.Logging;
 using Serilog.Events;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
 
 namespace WebApp
 {
@@ -29,7 +21,7 @@ namespace WebApp
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.WithProperty("HostName", HostName)
-                .Enrich.WithProperty("StartupContext", AppName)
+                .Enrich.WithProperty("ApplicationContext", AppName)
                 .WriteTo.Console()
                 .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
                 .CreateLogger();
@@ -46,7 +38,7 @@ namespace WebApp
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "----- Program terminated unexpectedly ({ApplicationContext})!", AppName);
+                Log.Fatal(ex, "----- Program terminated unexpectedly ({ApplicationContext}): {ErrorMessage}", AppName, ex.Message);
                 return 1;
             }
             finally
@@ -56,26 +48,41 @@ namespace WebApp
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var startupException = Environment.GetEnvironmentVariable("STARTUP_EXCEPTION");
+
+            var builder = Host.CreateDefaultBuilder(args)
                 .UseSerilog((context, services, loggerConfiguration) =>
                 {
-                    Log.Information("----- Configuring logging...");
+                    Log.Debug("----- Configuring logging...");
 
                     loggerConfiguration
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.WithProperty("HostName", HostName)
                         .Enrich.WithProperty("ApplicationContext", AppName)
                         .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341");
+
+                    ExceptionProbe.ThrowIf(startupException, "CreateHostBuilder.UseSerilog");
+
+                    Log.Debug("----- Closing startup logger ({ApplicationContext})...", AppName);
+                    Log.CloseAndFlush();
                 },
                 writeToProviders: true)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    Log.Information("----- Configuring WebHost defaults...");
+                    Log.Debug("----- Configuring WebHost defaults...");
 
                     webBuilder
                         .UseStartup<Startup>()
                         .CaptureStartupErrors(false);
+
+                    ExceptionProbe.ThrowIf(startupException, "CreateHostBuilder.ConfigureWebHostDefaults");
                 });
+
+            ExceptionProbe.ThrowIf(startupException, "CreateHostBuilder");
+
+            return builder;
+        }
     }
 }

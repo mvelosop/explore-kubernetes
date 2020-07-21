@@ -1,25 +1,24 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace WebApi
 {
     public class Startup
     {
+        readonly string startupException;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            startupException = Configuration["STARTUP_EXCEPTION"];
+
+            ExceptionProbe.ThrowIf(startupException, "Startup");
         }
 
         public IConfiguration Configuration { get; }
@@ -27,20 +26,22 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Information("----- Begin configuring services.");
+            Log.Debug("----- Begin configuring services.");
 
             services.AddControllers();
 
             services.AddApplicationInsightsTelemetry(Configuration);
             services.AddApplicationInsightsKubernetesEnricher();
 
-            Log.Information("----- End configuring services.");
+            ExceptionProbe.ThrowIf(startupException, "ConfigureServices");
+
+            Log.Debug("----- End configuring services.");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Log.Information("----- Begin configuring pipeline.");
+            Log.Debug("----- Begin configuring pipeline.");
 
             var pathBase = Configuration["PATH_BASE"];
             if (!string.IsNullOrWhiteSpace(pathBase))
@@ -74,7 +75,9 @@ namespace WebApi
                 endpoints.MapControllers();
             });
 
-            Log.Information("----- End configuring pipeline.");
+            ExceptionProbe.ThrowIf(startupException, "Configure");
+
+            Log.Debug("----- End configuring pipeline.");
         }
     }
 }

@@ -9,6 +9,9 @@ data:
   ASPNETCORE_ENVIRONMENT: Development
   ASPNETCORE_URLS: http://+:80
   SEQ_URL: "http://weatherapp-seq"
+{{- if .Values.startupException }}
+  STARTUP_EXCEPTION: {{ .Values.startupException }}
+{{- end }}
 {{- if .Values.ingress.enabled }}
 {{- with index .Values.ingress.hosts 0 }}
 {{- with index .paths 0 }}
