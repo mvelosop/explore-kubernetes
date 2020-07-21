@@ -6,6 +6,11 @@ param (
 $app = "weatherapp"
 $chartsFolder = "charts"
 
+$docker = $(kubectl config current-context)
+
+Write-Output ""
+Write-Output "Deploying to ""$docker""..."
+
 if ("$charts" -eq "") {
     Write-Output ""
     Write-Output "Uninstalling Helm charts..."
