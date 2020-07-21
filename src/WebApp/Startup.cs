@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -37,6 +38,18 @@ namespace WebApp
             {
                 client.BaseAddress = new Uri(Configuration["WebApiBaseAddress"]);
             });
+
+            //services.AddSingleton(sp =>
+            //{
+            //    var configuration = TelemetryConfiguration.CreateDefault();
+            //    configuration.InstrumentationKey = Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
+            //    configuration.TelemetryInitializers.Add(new OperationCorrelationTelemetryInitializer());
+
+            //    return configuration;
+            //});
+
+            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddApplicationInsightsKubernetesEnricher();
 
             Log.Information("----- End configuring services.");
         }

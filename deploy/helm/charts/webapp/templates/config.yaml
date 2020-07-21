@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "webapp.labels" . | nindent 4 }}
 data:
+  APPINSIGHTS_INSTRUMENTATIONKEY: fb061735-2a47-48c7-a306-5eeaae90ed16
   ASPNETCORE_ENVIRONMENT: Development
   ASPNETCORE_URLS: http://+:80
   SEQ_URL: "http://weatherapp-seq"

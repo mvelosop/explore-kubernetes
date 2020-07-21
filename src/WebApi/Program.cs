@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using Serilog.Extensions.Logging;
 using Serilog.Events;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace WebApi
 {
@@ -25,6 +27,7 @@ namespace WebApi
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
                 .Enrich.WithProperty("HostName", HostName)
                 .Enrich.WithProperty("StartupContext", AppName)
                 .WriteTo.Console()
@@ -48,7 +51,7 @@ namespace WebApi
             }
             finally
             {
-                Log.Information("----- Host stopped ({ApplicationContext})...", AppName);
+                Log.Information("----- Host stopped ({ApplicationContext}).", AppName);
                 Log.CloseAndFlush();
             }
         }
@@ -59,16 +62,23 @@ namespace WebApi
                 {
                     Log.Information("----- Configuring logging...");
 
+                    var telemetryConfiguration = services.GetRequiredService<TelemetryConfiguration>();
+
                     loggerConfiguration
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.WithProperty("HostName", HostName)
                         .Enrich.WithProperty("ApplicationContext", AppName)
                         .WriteTo.Console()
-                        .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341");
+                        .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
+                        .WriteTo.ApplicationInsights(telemetryConfiguration, TelemetryConverter.Traces);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    Log.Information("----- Configuring WebHost defaults...");
+
+                    webBuilder
+                        .UseStartup<Startup>()
+                        .CaptureStartupErrors(false);
                 });
     }
 }

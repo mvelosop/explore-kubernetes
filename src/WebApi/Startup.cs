@@ -31,6 +31,9 @@ namespace WebApi
 
             services.AddControllers();
 
+            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddApplicationInsightsKubernetesEnricher();
+
             Log.Information("----- End configuring services.");
         }
 
